@@ -22,6 +22,13 @@
 - Contains ads: No
 - App access: All functionality is available without login. A HomePod, Apple TV, or AirPlay-compatible receiver on the same Wi-Fi network is needed to test playback.
 
+## Store Graphics
+
+- App icon: `fastlane/metadata/android/en-US/images/icon.png`
+- Feature graphic: `fastlane/metadata/android/en-US/images/featureGraphic.png`
+- Phone screenshot 1: `fastlane/metadata/android/en-US/images/phoneScreenshots/1.png`
+- Phone screenshot 2: `fastlane/metadata/android/en-US/images/phoneScreenshots/2.png`
+
 ## Data Safety Draft
 
 - Data collected by developer: No
