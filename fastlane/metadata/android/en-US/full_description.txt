@@ -1,0 +1,15 @@
+Android2Apple4Music is a free Android app for playing allowed Android audio on HomePod, Apple TV, and AirPlay-compatible speakers on the same Wi-Fi network.
+
+Connect your Pixel or Android phone to a nearby AirPlay-compatible receiver, approve Android's capture prompt, then play music from Spotify or another app that allows Android playback capture.
+
+Features:
+- AirPlay-compatible local network playback
+- HomePod discovery with manual IP fallback
+- Phone speaker mute guard while the speaker plays
+- Phone volume sync and in-app speaker volume control
+- Visible foreground service with a Stop action
+- No ads, no analytics, and no developer-operated cloud audio storage
+
+Android2Apple4Music does not bypass Apple FairPlay, app DRM, subscriptions, or capture restrictions. Some apps may block playback capture for protected content.
+
+Made free by PelPush.com Accounting, MarkCompass.com, RealArb.com, and MarcPelberg.com.

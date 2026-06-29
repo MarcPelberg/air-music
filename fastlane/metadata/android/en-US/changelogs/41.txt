@@ -1,0 +1,3 @@
+Fixes audio-only HomePod sessions dropping after a short timeout by starting AirPlay keepalive and feedback loops immediately for audio-only playback.
+
+Also includes phone volume sync, phone speaker mute guard, and output headroom for cleaner speaker playback.

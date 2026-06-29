@@ -1,0 +1,161 @@
+<resources>
+    <!-- Tabs -->
+    <string name="overview">Overview</string>
+    <string name="tab_moonlight">Moonlight (Sunshine)</string>
+    <string name="tab_logs">Logs</string>
+    <string name="export">Export</string>
+    <string name="clear">Clear</string>
+    <string name="tab_settings">Settings</string>
+    <string name="tab_airplay">Android2Apple4Music</string>
+    <string name="tab_displaylink">DisplayLink</string>
+    <string name="displaylink_libs_status_imported">Libraries imported</string>
+    <string name="displaylink_libs_status_missing">Libraries not found</string>
+    <string name="displaylink_libs_status_active">Active</string>
+    <string name="displaylink_libs_detail_imported">DisplayLink USB display support is ready</string>
+
+    <!-- Permissions status card -->
+    <string name="permissions_granted">Ready</string>
+    <string name="permissions_granted_detail">All permissions granted</string>
+    <string name="permissions_not_granted">Missing permissions</string>
+    <string name="permissions_not_granted_detail">Certain features will not work</string>
+
+    <!-- Settings section headers -->
+    <string name="section_permissions">Permissions</string>
+    <string name="section_display">Streaming</string>
+
+    <string name="section_input">Input</string>
+    <string name="section_moonlight">Moonlight Settings</string>
+    <string name="section_displaylink_libraries">DisplayLink Libraries</string>
+
+    <string name="section_moonlight_controls">Controls</string>
+    <string name="start">Start Sunshine Server</string>
+    <string name="stop">Stop</string>
+    <!-- Moonlight status -->
+    <string name="moonlight_status_idle">Moonlight not running</string>
+    <string name="moonlight_status_idle_detail">Tap Start to begin streaming</string>
+    <string name="moonlight_status_waiting">Waiting for connection</string>
+    <string name="moonlight_status_waiting_detail">Connect from Moonlight client</string>
+    <string name="moonlight_status_casting">Moonlight active</string>
+    <string name="moonlight_status_casting_detail">Streaming to connected client</string>
+
+    <!-- Display interaction -->
+    <string name="touchscreen_control">Touchscreen</string>
+    <string name="touchscreen_control_desc">Use the touchscreen on this device as an input for the virtual display. Content on the virtual display will be mirrored to this device. Only available while this app owns the virtual display.</string>
+    <string name="touchscreen_control_desc_unavailable">Start a virtual display server to use this input</string>
+    <string name="exit_vertical">Exit</string>
+    <string name="back_vertical">Back</string>
+
+    <!-- Common -->
+    <string name="exit">Exit</string>
+    <string name="authorize">Authorize</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="connect">Connect</string>
+    <string name="width_label">Width</string>
+    <string name="height_label">Height</string>
+    <string name="refresh_rate_label">Refresh rate</string>
+    <string name="manage_this_display">Manage This Display</string>
+    <string name="manage_system_display_settings">Manage System Display Settings</string>
+    <string name="extend_app_not_installed">Install the Extend app to proceed</string>
+    <string name="touchscreen_unavailable">Touchscreen control is no longer available for this display.</string>
+    <!-- Permission status -->
+    <string name="status_not_started">Not started</string>
+    <string name="status_started_not_authorized_server">Unauthorized (UID: %d)</string>
+    <string name="status_authorized_server">Authorized (UID: %d)</string>
+    <string name="status_authorized">Authorized</string>
+    <string name="status_not_authorized">Unauthorized</string>
+    <string name="shizuku_uid_dropped">Shizuku started as root. Using UID %d for compatibility.</string>
+
+    <!-- activity_about -->
+    <string name="version_format">Version: %1$s (Android %2$s)</string>
+    <string name="version_unknown">Version: Unknown</string>
+    <string name="export_log_needs_shizuku">Exporting log files requires Shizuku permission</string>
+    <string name="website_label">Source: github.com/MarcPelberg/android2apple4music</string>
+
+    <!-- fragment_home -->
+    <string name="shizuku_permission_status">Shizuku</string>
+
+    <!-- dialog_resolution_settings -->
+    <string name="resolution_explanation">This only controls the output resolution of the DisplayLink chip in the adapter. For USB-C DisplayPort connections, the resolution is determined by Android automatically. For Sunshine/Moonlight, resolution and bitrate can be changed on client side.</string>
+    <string name="preset_resolution">Preset</string>
+
+    <!-- dialog_manual_client_input -->
+    <string name="ip_address">IP address</string>
+    <string name="port">Port</string>
+
+    <!-- activity_mirror_settings -->
+    <string name="overlay_status">Display over other apps</string>
+    <string name="trusted_display">Create as trusted virtual display</string>
+    <string name="trusted_display_desc">Create the virtual display as a trusted display. This enables other apps to set keyboard policy and other features. Requires Shizuku.</string>
+    <string name="auto_rotate">Rotate stream with device</string>
+    <string name="auto_rotate_desc">When the device is rotated, recreate the stream to match the new orientation.</string>
+    <string name="auto_scale_remove_bars">Fill stream to remove black bars</string>
+    <string name="auto_scale_remove_bars_desc">Crop and scale the captured screen to fill the stream resolution, removing letterbox bars.</string>
+    <string name="input_to_external_display">Send input to external display</string>
+    <string name="input_to_external_display_desc">Route remote keyboard, mouse, touch, and controller input to the external display instead of the device screen.</string>
+    <string name="auto_match_aspect_ratio">Match Moonlight aspect ratio</string>
+    <string name="auto_match_aspect_ratio_desc">Adjust main screen aspect ratio to match the external display resolution.</string>
+    <string name="prevent_auto_lock">Prevent auto-lock</string>
+    <string name="prevent_auto_lock_desc">Modifies the system screen timeout setting.</string>
+    <string name="no_audio_try_no_remote_submix">Disable REMOTE_SUBMIX</string>
+    <string name="no_audio_try_no_remote_submix_desc">Fix audio issues in Moonlight.</string>
+    <string name="auto_connect_moonlight">Auto-connect Moonlight (Beta)</string>
+    <string name="auto_connect_moonlight_desc">Proactively send a JSON connect request to the Moonlight client. Requires a fork with the autostart listener. Not compatible with standard Moonlight.</string>
+    <string name="show_moonlight_cursor">Show cursor location</string>
+    <string name="show_moonlight_cursor_desc">Show a cursor overlay on the device screen for Moonlight mouse input.</string>
+    <string name="moonlight_device_name">Device name</string>
+    <string name="section_airplay_controls">HomePod</string>
+    <string name="airplay_discover">Scan for HomePod</string>
+    <string name="airplay_no_devices">HomePod not connected</string>
+    <string name="airplay_no_devices_detail">Search for your HomePod on Wi-Fi</string>
+    <string name="airplay_connecting">Connecting to HomePod</string>
+    <string name="airplay_connecting_detail">Looking on the local network</string>
+    <string name="airplay_connected">Connected</string>
+    <string name="airplay_connected_detail">Audio capture is active</string>
+    <string name="airplay_devices_found_detail">Choose the HomePod and connect</string>
+    <string name="airplay_volume">HomePod Volume</string>
+    <string name="airplay_mute_phone_speaker">Mute Phone Speaker</string>
+    <string name="airplay_mute_phone_speaker_desc">Silence Pixel audio while HomePod plays</string>
+    <string name="airplay_phone_volume_sync">Phone Volume Sync</string>
+    <string name="airplay_phone_volume_sync_desc">Use Pixel media volume for HomePod volume</string>
+    <string name="airplay_connect_title">Enter PIN for %s</string>
+    <string name="airplay_pin_hint">PIN code</string>
+    <string name="airplay_manual_ip">Manual IP</string>
+    <string name="airplay_manual_ip_hint">IP address (e.g. 192.168.1.100)</string>
+    <string name="airplay_manual_port_hint">Port (default 7000)</string>
+    <string name="change_displaylink_output_settings">Change DisplayLink Output Settings</string>
+    <string name="displaylink_resolution_title">DisplayLink Output Settings</string>
+    <string name="displaylink_output_format">Current output: %1$dx%2$d@%3$dHz</string>
+    <string name="quick_presets">Custom</string>
+    <string name="manual_input">Manual input</string>
+    <string name="manual_input_client_title">Manual input client</string>
+
+    <!-- MirrorMainActivity status -->
+    <!-- SunshineService notification -->
+    <string name="mirror_app_name">Android2Apple4Music</string>
+    <string name="airplay_notification_text">Route on for Spotify and allowed apps</string>
+    <string name="sunshine_service_running">Sunshine service is running</string>
+
+    <!-- SunshineServer PIN dialog -->
+    <string name="enter_pin_title">Enter 4-digit PIN code</string>
+    <string name="enter_pin_hint">PIN code</string>
+    <string name="enter_pin_error">Enter a 4-digit PIN</string>
+    <string name="encoder_error_title">Failed to configure encoder</string>
+
+    <!-- FetchLogAndShare -->
+    <string name="cannot_start_user_service">Failed to start user service to get logs</string>
+    <string name="no_logs_to_export">No logs to export</string>
+    <string name="share_log_file">Share log file</string>
+    <string name="log_export_failed">Failed to export logs</string>
+
+    <!-- APK Import -->
+    <string name="auto_import_displaylink_libs">Automatically download and import libraries</string>
+    <string name="manual_import_displaylink_libs">Manually import from an application package (APK)</string>
+    <string name="import_displaylink_libs_prompt">Import the DisplayLink Presenter Android application package (APK). This will enable USB display support for USB 2 devices.</string>
+    <string name="import_success">Libraries imported successfully</string>
+    <string name="import_failed">Import failed: %s</string>
+    <string name="downloading_displaylink">Downloading DisplayLink libraries...</string>
+    <string name="displaylink_apk_url_label">Custom DisplayLink Presenter app download URL</string>
+    <string name="about_displaylink_legal_notice">This app uses publicly available drivers to support DisplayLink\u00ae devices. Users should comply with the relevant licensing terms of Synaptics when using DisplayLink\u00ae related features. This app is not affiliated with Synaptics.</string>
+
+</resources>

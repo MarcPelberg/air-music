@@ -1,0 +1,121 @@
+diff --git a/internal/airplay/pairing.go b/internal/airplay/pairing.go
+index c21b7e1..ea65991 100644
+--- a/internal/airplay/pairing.go
++++ b/internal/airplay/pairing.go
+@@ -49,8 +49,12 @@ const (
+ 
+ // pairHeaders returns extra HTTP headers required for pair-setup / pair-verify.
+ func (c *AirPlayClient) pairHeaders() map[string]string {
++	return c.pairHeadersFor("3")
++}
++
++func (c *AirPlayClient) pairHeadersFor(hkp string) map[string]string {
+ 	return map[string]string{
+-		"X-Apple-HKP": "3",
++		"X-Apple-HKP": hkp,
+ 	}
+ }
+ 
+@@ -102,15 +106,11 @@ func (c *AirPlayClient) performTransientSetupAndVerify(ctx context.Context) erro
+ 	serverPub, err := c.rawPairSetup(ctx)
+ 	if err != nil {
+ 		// Fall back to TLV8/HomeKit-style pair-setup (Apple TV)
+-		dbg("[PAIR] raw pair-setup failed (%v), trying TLV8 pair-setup", err)
++		dbg("[PAIR] raw pair-setup failed (%v), trying HomeKit transient pair-setup", err)
+ 		if err := c.pairSetupTransient(ctx); err != nil {
+ 			return fmt.Errorf("pair-setup: %w", err)
+ 		}
+-		dbg("[PAIR] transient pair-setup complete, starting HAP pair-verify")
+-		if err := c.PairVerify(ctx); err != nil {
+-			return fmt.Errorf("pair-verify: %w", err)
+-		}
+-		dbg("[PAIR] pair-verify complete, channel is now encrypted")
++		dbg("[PAIR] HomeKit transient pair-setup complete, channel is now encrypted")
+ 		return nil
+ 	}
+ 
+@@ -155,7 +155,7 @@ func (c *AirPlayClient) pairSetupTransient(ctx context.Context) error {
+ 		{Tag: tlvFlags, Value: flags},
+ 	})
+ 
+-	m2Bytes, err := c.httpRequest("POST", "/pair-setup", "application/octet-stream", m1, c.pairHeaders())
++	m2Bytes, err := c.httpRequest("POST", "/pair-setup", "application/octet-stream", m1, c.pairHeadersFor("4"))
+ 	if err != nil {
+ 		return fmt.Errorf("M1: %w", err)
+ 	}
+@@ -171,8 +171,8 @@ func (c *AirPlayClient) pairSetupTransient(ctx context.Context) error {
+ 		return fmt.Errorf("M2: missing server public key")
+ 	}
+ 
+-	// SRP-6a exchange with empty PIN for transient
+-	return c.completeSRPExchange(ctx, "", serverSalt, serverPub)
++	// HomePod transient SRP uses the well-known transient PIN without showing a code.
++	return c.completeTransientSRPExchange(ctx, "3939", serverSalt, serverPub)
+ }
+ 
+ // StartPINDisplay triggers the PIN display on the Apple TV.
+@@ -238,6 +238,14 @@ func (c *AirPlayClient) pairSetup(ctx context.Context, pin string) error {
+ 
+ // completeSRPExchange finishes SRP from M3 onward (shared by PIN and transient flows).
+ func (c *AirPlayClient) completeSRPExchange(ctx context.Context, pin string, salt, serverPubB []byte) error {
++	return c.completeSRPExchangeMode(ctx, pin, salt, serverPubB, false)
++}
++
++func (c *AirPlayClient) completeTransientSRPExchange(ctx context.Context, pin string, salt, serverPubB []byte) error {
++	return c.completeSRPExchangeMode(ctx, pin, salt, serverPubB, true)
++}
++
++func (c *AirPlayClient) completeSRPExchangeMode(ctx context.Context, pin string, salt, serverPubB []byte, transient bool) error {
+ 	username := []byte("Pair-Setup")
+ 	password := []byte(pin)
+ 
+@@ -296,7 +309,11 @@ func (c *AirPlayClient) completeSRPExchange(ctx context.Context, pin string, sal
+ 		{Tag: tlvPublicKey, Value: padTo(A.Bytes(), 384)},
+ 		{Tag: tlvProof, Value: m1Proof[:]},
+ 	})
+-	m4Bytes, err := c.httpRequest("POST", "/pair-setup", "application/octet-stream", m3, c.pairHeaders())
++	pairSetupHeaders := c.pairHeaders()
++	if transient {
++		pairSetupHeaders = c.pairHeadersFor("4")
++	}
++	m4Bytes, err := c.httpRequest("POST", "/pair-setup", "application/octet-stream", m3, pairSetupHeaders)
+ 	if err != nil {
+ 		return fmt.Errorf("M3: %w", err)
+ 	}
+@@ -320,6 +328,11 @@ func (c *AirPlayClient) completeSRPExchange(ctx context.Context, pin string, sal
+ 		}
+ 	}
+ 
++	if transient {
++		c.PairKeys.SharedSecret = K
++		return c.enableControlEncryption(K)
++	}
++
+ 	// M5: Exchange Ed25519 keys over encrypted channel
+ 	hkdfSalt := []byte("Pair-Setup-Encrypt-Salt")
+ 	hkdfInfo := []byte("Pair-Setup-Encrypt-Info")
+@@ -366,6 +379,24 @@ func (c *AirPlayClient) completeSRPExchange(ctx context.Context, pin string, sal
+ 	return nil
+ }
+ 
++func (c *AirPlayClient) enableControlEncryption(shared []byte) error {
++	c.encWriteKey = hkdfSHA512(shared, []byte("Control-Salt"), []byte("Control-Write-Encryption-Key"), 32)
++	c.encReadKey = hkdfSHA512(shared, []byte("Control-Salt"), []byte("Control-Read-Encryption-Key"), 32)
++	c.PairKeys.WriteKey = c.encWriteKey
++	c.PairKeys.ReadKey = c.encReadKey
++
++	writeCipher, err := chacha20poly1305.New(c.encWriteKey)
++	if err != nil {
++		return fmt.Errorf("write cipher: %w", err)
++	}
++	c.encCipher = writeCipher
++	c.encWriteNonce = 0
++	c.encReadNonce = 0
++	c.encrypted = true
++	dbg("[PAIR] control-channel encryption ENABLED")
++	return nil
++}
++
+ // pairVerify establishes an encrypted channel using X25519 + Ed25519.
+ func (c *AirPlayClient) PairVerify(ctx context.Context) error {
+ 	// Generate ephemeral X25519 key pair

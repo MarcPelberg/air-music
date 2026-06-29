@@ -1,0 +1,15 @@
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/app/build
+/hidden-api-stub/bin
+/dist
+
+/app/libs/airplaylib.aar
+/app/libs/airplaylib-sources.jar

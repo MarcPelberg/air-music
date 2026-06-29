@@ -1,0 +1,34 @@
+diff --git a/internal/airplay/pairing.go b/internal/airplay/pairing.go
+--- a/internal/airplay/pairing.go
++++ b/internal/airplay/pairing.go
+@@ -96,10 +96,30 @@ func (c *AirPlayClient) pairTransient(ctx context.Context) error {
+ 	return c.performTransientSetupAndVerify(ctx)
+ }
+ 
++func (c *AirPlayClient) shouldUseHomeKitTransientPairing() bool {
++	if AppleReceiver {
++		return true
++	}
++	if c.info == nil {
++		return false
++	}
++	const homePodModelPrefix = "AudioAccessory"
++	return len(c.info.Model) >= len(homePodModelPrefix) && c.info.Model[:len(homePodModelPrefix)] == homePodModelPrefix
++}
++
+ // performTransientSetupAndVerify does transient (PIN-less) pair-setup + pair-verify.
+ func (c *AirPlayClient) performTransientSetupAndVerify(ctx context.Context) error {
+ 	dbg("[PAIR] starting transient pair-setup")
+ 
++	if c.shouldUseHomeKitTransientPairing() {
++		dbg("[PAIR] using HomeKit transient pair-setup for HomePod-class receiver")
++		if err := c.pairSetupTransient(ctx); err != nil {
++			return fmt.Errorf("pair-setup: %w", err)
++		}
++		dbg("[PAIR] HomeKit transient pair-setup complete, channel is now encrypted")
++		return nil
++	}
++
+ 	// Try raw binary pair-setup first (UxPlay / legacy AirPlay protocol).
+ 	// Send 32-byte Ed25519 public key, expect 32-byte server public key back.
+ 	dbg("[PAIR] trying raw binary pair-setup (UxPlay-compatible)")

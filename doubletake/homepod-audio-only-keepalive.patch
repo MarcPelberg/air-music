@@ -1,0 +1,130 @@
+diff --git a/internal/airplay/audio.go b/internal/airplay/audio.go
+index b41806a..0b28740 100644
+--- a/internal/airplay/audio.go
++++ b/internal/airplay/audio.go
+@@ -636,13 +636,12 @@ func (as *AudioStream) Close() {
+ func (s *MirrorSession) StreamAudio(ctx context.Context, capture *AudioCapture, audioStream *AudioStream) error {
+ 	spf := uint32(audioStream.spf)
+ 
+-	// Wait for the first video frame before starting audio.
+-	// The Apple TV processes audio in the context of an active video stream;
+-	// sending audio before video may cause it to be discarded.
+-	dbg("[AUDIO] waiting for first video frame before starting audio...")
++	// Wait until mirroring is active. For normal mirroring this is the first video
++	// frame; for Android2Apple4Music's audio-only route it is signaled right after setup.
++	dbg("[AUDIO] waiting for AirPlay stream to become active...")
+ 	select {
+ 	case <-s.firstFrameSent:
+-		dbg("[AUDIO] first video frame sent, starting audio")
++		dbg("[AUDIO] AirPlay stream active, starting audio")
+ 	case <-ctx.Done():
+ 		return ctx.Err()
+ 	}
+diff --git a/internal/airplay/mirror.go b/internal/airplay/mirror.go
+index c1351e0..e46d542 100644
+--- a/internal/airplay/mirror.go
++++ b/internal/airplay/mirror.go
+@@ -38,7 +38,7 @@ type MirrorSession struct {
+ 	chachaCipher   cipher.AEAD         // ChaCha20-Poly1305 AEAD (nil = use AES-CTR)
+ 	chachaNonce    uint64              // per-frame nonce counter
+ 	frameSeq       uint32
+-	firstFrameSent chan struct{} // closed after first video frame is sent
++	firstFrameSent chan struct{} // closed after video or audio-only streaming starts
+ 
+ 	// Audio
+ 	audioStream *AudioStream
+@@ -52,6 +52,19 @@ func selectAudioSecurityMode(encrypted bool) audioSecurityMode {
+ 	return audioSecurityLegacyAES
+ }
+ 
++func (s *MirrorSession) markStreamStarted(reason string) {
++	select {
++	case <-s.firstFrameSent:
++	default:
++		close(s.firstFrameSent)
++		dbg("[STREAM] marked active: %s", reason)
++	}
++}
++
++func (s *MirrorSession) isAudioOnly() bool {
++	return s.videoWidth <= 0 || s.videoHeight <= 0
++}
++
+ // setupMirrorSession negotiates the mirroring stream with the Apple TV.
+ func (c *AirPlayClient) setupMirrorSession(ctx context.Context, cfg StreamConfig) (*MirrorSession, error) {
+ 	sessionUUID := generateUUID()
+@@ -559,6 +572,9 @@ func (c *AirPlayClient) setupMirrorSession(ctx context.Context, cfg StreamConfig
+ 	go session.heartbeatLoop(ctx, controlURI, sessionUUID)
+ 	go session.dataHeartbeatLoop(ctx)
+ 	go session.feedbackLoop(ctx, controlURI)
++	if session.isAudioOnly() {
++		session.markStreamStarted("audio-only session")
++	}
+ 
+ 	return session, nil
+ }
+@@ -619,12 +635,8 @@ func (s *MirrorSession) StreamFrames(ctx context.Context, capture *ScreenCapture
+ 			if err := s.sendCodecFrame(avcC, packetTimestamp); err != nil {
+ 				return fmt.Errorf("send codec: %w", err)
+ 			}
+-			// Signal that the first frame has been sent (unblocks data heartbeat)
+-			select {
+-			case <-s.firstFrameSent:
+-			default:
+-				close(s.firstFrameSent)
+-			}
++			// Signal that streaming is active (unblocks data heartbeat).
++			s.markStreamStarted("first video codec frame")
+ 			codecSent = true
+ 		}
+ 
+diff --git a/internal/airplay/mirror_setup_test.go b/internal/airplay/mirror_setup_test.go
+index 0e0fae3..51c1675 100644
+--- a/internal/airplay/mirror_setup_test.go
++++ b/internal/airplay/mirror_setup_test.go
+@@ -223,6 +223,45 @@ func TestSetupMirrorNoAudioStillNegotiatesAudioSession(t *testing.T) {
+ 	}
+ }
+ 
++func TestAudioOnlySessionMarksStreamStarted(t *testing.T) {
++	session := &MirrorSession{
++		videoWidth:     0,
++		videoHeight:    0,
++		firstFrameSent: make(chan struct{}),
++	}
++
++	if !session.isAudioOnly() {
++		t.Fatal("expected zero-sized stream to be treated as audio-only")
++	}
++
++	session.markStreamStarted("test audio-only session")
++	select {
++	case <-session.firstFrameSent:
++	case <-time.After(100 * time.Millisecond):
++		t.Fatal("audio-only session did not mark the AirPlay stream active")
++	}
++
++	session.markStreamStarted("second signal should be ignored")
++}
++
++func TestVideoSessionWaitsForFirstFrame(t *testing.T) {
++	session := &MirrorSession{
++		videoWidth:     1280,
++		videoHeight:    720,
++		firstFrameSent: make(chan struct{}),
++	}
++
++	if session.isAudioOnly() {
++		t.Fatal("expected non-zero dimensions to be treated as video mirroring")
++	}
++
++	select {
++	case <-session.firstFrameSent:
++		t.Fatal("video session should wait until the first frame is sent")
++	default:
++	}
++}
++
+ func readRTSPTestRequest(reader *bufio.Reader) (rtspTestRequest, error) {
+ 	line, err := reader.ReadString('\n')
+ 	if err != nil {
