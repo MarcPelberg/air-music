@@ -7,6 +7,8 @@
 - Version name: `0.0.41-android2apple4music`
 - App bundle SHA256: `BC35A00776ABC8FB143C77D4557E87F5024BC6D890876B52A6E91CF6E0CBFA9C`
 - Public APK SHA256: `8AD54585ABF1FE5A48A43EDF555DF02CDE01CE6C94529E72341354BD5F6C3595`
+- Local Play submission ZIP: `dist/playstore_submission_android2apple4music_v0.0.41.zip`
+- Local Play submission ZIP SHA256: `983652670C70982340E52CE258D6F393C93F75110919FFA88019F746876B8EEB`
 
 ## Public Links
 
@@ -19,7 +21,7 @@
 - App name: `Android2Apple4Music`
 - Short description: `Play Android music on HomePod and AirPlay-compatible speakers.`
 - Category suggestion: Music & Audio
-- Contains ads: No
+- Contains ads / promotional content: Yes. The app includes a sponsor banner and sponsor links. It does not include an ad SDK, third-party tracking, paid ads, or behavioral ad targeting.
 - App access: All functionality is available without login. A HomePod, Apple TV, or AirPlay-compatible receiver on the same Wi-Fi network is needed to test playback.
 
 ## Store Graphics
@@ -32,7 +34,8 @@
 ## Data Safety Draft
 
 - Data collected by developer: No
-- Data shared with developer, sponsors, analytics, or ads: No
+- Data shared with developer, sponsors, analytics, or ad networks: No
+- Advertising ID used: No
 - Data encrypted in transit: Local AirPlay protocol traffic is sent over the user's local network to the selected receiver. No developer server receives it.
 - Account creation: No
 - Users can request data deletion: Not applicable because the app does not collect developer-side user data.
